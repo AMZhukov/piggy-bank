@@ -5,9 +5,10 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js",
-    "dev": "nodemon server.js",
-    "prod": "cross-env NODE_ENV=production node server.js"
+    "startServer": "nodemon server.js",
+    "startClient": "npm run start --prefix client",
+    "prod": "cross-env NODE_ENV=production node server.js ",
+    "start": "concurrently \"npm run startClient\" \"npm run startServer\""
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,7 @@
     "prettier": "^2.2.1"
   },
   "dependencies": {
+    "concurrently": "^5.3.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "joi": "^17.3.0",
