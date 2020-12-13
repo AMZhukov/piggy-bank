@@ -17,22 +17,42 @@ class App extends React.Component {
     date: new Date(),
   };
 
-  addTransaction = (event) => {
-    event.preventDefault();
+  async request(url, method = 'GET', data = null) {
+    try {
+      const headers = {};
+      let body = null;
+      if (data) {
+        body = JSON.stringify(data);
+        headers['Content-Type'] = 'application/json';
+        console.log(data);
+      }
+      const response = await fetch(url, { method, headers, body });
+      return await response.json();
+    } catch (error) {
+      console.warn('Error', error.message);
+    }
+  }
 
-    const transaction = {
-      id: `cmr${(+new Date()).toString(16)}`,
-      description: this.state.description,
-      amount: this.state.amount,
-      isIncome: this.state.isIncome,
-      date: this.state.date,
-    };
+  addTransaction = async (event) => {
+    try {
+      event.preventDefault();
 
-    event.target.reset();
+      const transaction = {
+        description: this.state.description,
+        amount: this.state.amount,
+        isIncome: this.state.isIncome,
+        date: this.state.date,
+        _id: null,
+      };
+      transaction._id = await this.request('/api/addTransaction', 'POST', transaction);
+      event.target.reset();
 
-    this.setState({ transactions: [...this.state.transactions, transaction] }, () =>
-      this.calculateIncomeExpenses(),
-    );
+      this.setState({ transactions: [...this.state.transactions, transaction] }, () =>
+        this.calculateIncomeExpenses(),
+      );
+    } catch (error) {
+      console.warn('Error', error.message);
+    }
   };
 
   addAmount = (event) => {
@@ -86,10 +106,7 @@ class App extends React.Component {
   };
 
   calculateTotalMoney = () => {
-    this.setState(
-      { totalMoney: this.state.sumIncome - this.state.sumExpenses },
-      console.log(this.state),
-    );
+    this.setState({ totalMoney: this.state.sumIncome - this.state.sumExpenses });
   };
 
   deleteTransaction = (id) => {

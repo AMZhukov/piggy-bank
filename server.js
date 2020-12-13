@@ -9,7 +9,9 @@ console.log(`Env loading ${isProd ? 'PROD' : 'DEV'} file`);
 
 const app = express();
 
-app.use('api/createExpendsIncome', require('./routes/createExpendsIncomeRoutes.js'));
+app.use(express.json({ extended: true }));
+
+app.use('/api', require('./routes/API.js'));
 
 async function start() {
   try {

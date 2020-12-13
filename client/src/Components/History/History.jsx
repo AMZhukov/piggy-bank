@@ -7,7 +7,7 @@ export const History = ({ transactions, deleteTransaction }) => {
       <h3>История расходов</h3>
       <ul className="history__list">
         {transactions.map((item) => (
-          <HistoryItem transaction={item} key={item.id} deleteTransaction={deleteTransaction} />
+          <HistoryItem transaction={item} key={item._id} deleteTransaction={deleteTransaction} />
         ))}
       </ul>
     </section>
