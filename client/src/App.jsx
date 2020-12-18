@@ -24,10 +24,9 @@ class App extends React.Component {
       if (data) {
         body = JSON.stringify(data);
         headers['Content-Type'] = 'application/json';
-        console.log(data);
       }
-      const response = await fetch(url, { method, headers, body });
-      return await response.json();
+      const fetched = await fetch(url, { method, headers, body });
+      return fetched.json();
     } catch (error) {
       console.warn('Error', error.message);
     }
@@ -44,7 +43,8 @@ class App extends React.Component {
         date: this.state.date,
         _id: null,
       };
-      transaction._id = await this.request('/api/addTransaction', 'POST', transaction);
+      const response = await this.request('/api/addTransaction', 'POST', transaction);
+      transaction._id = response._id;
       event.target.reset();
 
       this.setState({ transactions: [...this.state.transactions, transaction] }, () =>
@@ -109,15 +109,28 @@ class App extends React.Component {
     this.setState({ totalMoney: this.state.sumIncome - this.state.sumExpenses });
   };
 
-  deleteTransaction = (id) => {
+  deleteTransaction = async (id) => {
     const transactions = [...this.state.transactions];
+    let transaction;
     for (let index = 0; index < transactions.length; index++) {
-      if (transactions[index].id === id) {
+      if (transactions[index]._id === id) {
+        transaction = transactions[index];
         transactions.splice(index, 1);
         break;
       }
     }
-    this.setState({ transactions }, () => this.calculateIncomeExpenses());
+    try {
+      const deleteTransactionFromDB = await this.request(
+        '/api/deleteTransaction',
+        'DELETE',
+        transaction,
+      );
+      if (deleteTransactionFromDB) {
+        this.setState({ transactions }, () => this.calculateIncomeExpenses());
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   render() {
