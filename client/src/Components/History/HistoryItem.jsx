@@ -8,7 +8,7 @@ export const HistoryItem = ({ transaction, deleteTransaction }) => {
       }`}
     >
       <div className="history__description">{transaction.description}</div>
-      <div className="history__date">{transaction.date.toLocaleDateString()}</div>
+      <div className="history__date">{new Date(transaction.date).toLocaleDateString()}</div>
       <div className="history__money">
         {transaction.isIncome ? '+' : '–'} {transaction.amount.toLocaleString()} &#8381;
         <button className="history__delete" onClick={() => deleteTransaction(transaction._id)}>

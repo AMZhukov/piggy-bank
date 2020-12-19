@@ -132,6 +132,20 @@ class App extends React.Component {
       console.log(error.message);
     }
   };
+  requestTransactionsHistory = async () => {
+    try {
+      const transactions = await this.request('/api/transactionsHistory', 'GET', null);
+      if (transactions) {
+        this.setState({ transactions }, () => this.calculateIncomeExpenses());
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  componentDidMount() {
+    this.requestTransactionsHistory();
+  }
 
   render() {
     return (

@@ -34,5 +34,13 @@ router.delete('/deleteTransaction', async (req, res) => {
     res.status(500).json({ message: `Error error while accessing the database: ${error.message}` });
   }
 });
+router.get('/transactionsHistory', async (req, res) => {
+  try {
+    transactions = await Transaction.find();
+    res.status(200).json(transactions);
+  } catch (error) {
+    res.status(500).json({ message: 'Все влшыо из под кролнотя'})
+  }
+});
 
 module.exports = router;
