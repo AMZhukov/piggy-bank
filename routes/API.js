@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const Transaction = require('../models/Transaction');
+const { getFirstDayOfMonth, getFirstDayOfNextMonth } = require('./operationWithDate');
 
 const router = Router();
 
@@ -7,7 +8,6 @@ const router = Router();
 router.post('/addTransaction', async (req, res) => {
   try {
     const { description, amount, isIncome, date } = req.body;
-
     const transaction = new Transaction({
       description,
       amount,
@@ -34,12 +34,24 @@ router.delete('/deleteTransaction', async (req, res) => {
     res.status(500).json({ message: `Error error while accessing the database: ${error.message}` });
   }
 });
-router.get('/transactionsHistory', async (req, res) => {
+router.post('/transactionsHistory', async (req, res) => {
   try {
-    transactions = await Transaction.find();
+    const { currentMonth, currentYear, currentTimezone } = req.body;
+
+    // to request relevant data according to the time zone
+    const firstDayOfMonth = getFirstDayOfMonth(currentMonth, currentYear, currentTimezone);
+    const firstDayOfNextMonth = getFirstDayOfNextMonth(currentMonth, currentYear, currentTimezone);
+
+    const transactions = await Transaction.find({
+      date: {
+        $gte: firstDayOfMonth,
+        $lt: firstDayOfNextMonth,
+      },
+    });
     res.status(200).json(transactions);
   } catch (error) {
-    res.status(500).json({ message: 'Все влшыо из под кролнотя'})
+    console.log(error);
+    res.status(500).json({ message: 'Все влшыо из под кролнотя' });
   }
 });
 

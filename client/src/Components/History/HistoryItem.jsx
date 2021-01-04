@@ -1,6 +1,12 @@
 import React from 'react';
 
-export const HistoryItem = ({ transaction, deleteTransaction }) => {
+export const HistoryItem = ({ transaction, deleteTransaction, currentTimezone }) => {
+  const date = new Date(transaction.date);
+  console.log(date);
+  console.log(currentTimezone);
+  console.log(transaction.serverTimezone);
+  date.setMinutes(date.getMinutes() - currentTimezone);
+  console.log(date);
   return (
     <li
       className={`history__item ${
@@ -15,7 +21,6 @@ export const HistoryItem = ({ transaction, deleteTransaction }) => {
           x
         </button>
       </div>
-
     </li>
   );
 };

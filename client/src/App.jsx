@@ -6,7 +6,6 @@ import { Operation } from './Components/Operation/Operation';
 
 class App extends React.Component {
   state = {
-    currentMonth: '',
     transactions: [],
     description: '',
     amount: '',
@@ -15,6 +14,7 @@ class App extends React.Component {
     sumExpenses: 0,
     totalMoney: 0,
     date: new Date(),
+    currentTimezone: new Date().getTimezoneOffset(),
   };
 
   async request(url, method = 'GET', data = null) {
@@ -44,10 +44,9 @@ class App extends React.Component {
         _id: null,
       };
       const response = await this.request('/api/addTransaction', 'POST', transaction);
-      transaction._id = response._id;
       event.target.reset();
 
-      this.setState({ transactions: [...this.state.transactions, transaction] }, () =>
+      this.setState({ transactions: [...this.state.transactions, response] }, () =>
         this.calculateIncomeExpenses(),
       );
     } catch (error) {
@@ -134,7 +133,14 @@ class App extends React.Component {
   };
   requestTransactionsHistory = async () => {
     try {
-      const transactions = await this.request('/api/transactionsHistory', 'GET', null);
+      console.log(this.state.currentTimezone);
+      const date = {
+        currentMonth: this.state.date.getMonth(),
+        currentYear: this.state.date.getFullYear(),
+        // currentTimeZone — for the correct time to query the transaction data because there are different time zones
+        currentTimezone: this.state.currentTimezone,
+      };
+      const transactions = await this.request('/api/transactionsHistory', 'POST', date);
       if (transactions) {
         this.setState({ transactions }, () => this.calculateIncomeExpenses());
       }
@@ -172,6 +178,7 @@ class App extends React.Component {
             <History
               transactions={this.state.transactions}
               deleteTransaction={this.deleteTransaction}
+              currentTimezone={this.state.currentTimezone}
             />
           </div>
         </main>
