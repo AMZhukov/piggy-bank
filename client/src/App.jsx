@@ -52,11 +52,9 @@ class App extends React.Component {
       event.target.reset();
 
       response.date = new Date(response.date);
-      if (!!this.checkWereDataRequests(response.date.getMonth(), response.date.getFullYear())) {
-        this.setState({ transactions: [...this.state.transactions, response] }, () =>
-          this.requestTransactionsHistory(),
-        );
-      }
+      this.setState({ transactions: [...this.state.transactions, response] }, () =>
+        this.requestTransactionsHistory(),
+      );
     } catch (error) {
       console.warn('Error', error.message);
     }
