@@ -7,6 +7,7 @@ import { Operation } from './Components/Operation/Operation';
 class App extends React.Component {
   state = {
     transactions: [],
+    transactionsCurrentMonth: [],
     description: '',
     amount: '',
     isIncome: false,
@@ -15,6 +16,9 @@ class App extends React.Component {
     totalMoney: 0,
     date: new Date(),
     currentTimezone: new Date().getTimezoneOffset(),
+    currentMonth: new Date().getMonth(),
+    currentYear: new Date().getFullYear(),
+    wereDataRequests: [],
   };
 
   async request(url, method = 'GET', data = null) {
@@ -44,11 +48,15 @@ class App extends React.Component {
         _id: null,
       };
       const response = await this.request('/api/addTransaction', 'POST', transaction);
+
       event.target.reset();
 
-      this.setState({ transactions: [...this.state.transactions, response] }, () =>
-        this.calculateIncomeExpenses(),
-      );
+      response.date = new Date(response.date);
+      if (!!this.checkWereDataRequests(response.date.getMonth(), response.date.getFullYear())) {
+        this.setState({ transactions: [...this.state.transactions, response] }, () =>
+          this.requestTransactionsHistory(),
+        );
+      }
     } catch (error) {
       console.warn('Error', error.message);
     }
@@ -68,7 +76,9 @@ class App extends React.Component {
 
     if (this.checkData(date, 'date')) {
       const date = new Date(`${event.target.value}`);
-      this.setState({ date });
+      const currentMonth = date.getMonth();
+      const currentYear = date.getFullYear();
+      this.setState({ date, currentMonth, currentYear }, () => this.requestTransactionsHistory());
     }
   };
 
@@ -91,12 +101,20 @@ class App extends React.Component {
     this.setState({ isIncome });
   };
 
+  changeMonth = (prevOrNext) => {
+    const date = new Date(this.state.date);
+    date.setMonth(date.getMonth() + prevOrNext);
+    const currentMonth = date.getMonth();
+    const currentYear = date.getFullYear();
+    this.setState({ date, currentMonth, currentYear }, () => this.requestTransactionsHistory());
+  };
+
   // This function execute calculating all transaction income either expenses
   calculateIncomeExpenses = () => {
     let sumIncome = 0;
     let sumExpenses = 0;
-    if (this.state.transactions[0]) {
-      this.state.transactions.forEach((item) => {
+    if (this.state.transactionsCurrentMonth[0]) {
+      this.state.transactionsCurrentMonth.forEach((item) => {
         if (item.isIncome) sumIncome += item.amount;
         else sumExpenses += item.amount;
       });
@@ -109,41 +127,60 @@ class App extends React.Component {
   };
 
   deleteTransaction = async (id) => {
-    const transactions = [...this.state.transactions];
-    let transaction;
-    for (let index = 0; index < transactions.length; index++) {
-      if (transactions[index]._id === id) {
-        transaction = transactions[index];
-        transactions.splice(index, 1);
-        break;
-      }
-    }
+    const prevTransactions = [...this.state.transactions];
+    const deleteTransaction = prevTransactions.find((transaction) => transaction._id === id);
+    const transactions = prevTransactions.filter((transaction) => transaction._id !== id);
+
     try {
       const deleteTransactionFromDB = await this.request(
         '/api/deleteTransaction',
         'DELETE',
-        transaction,
+        deleteTransaction,
       );
       if (deleteTransactionFromDB) {
-        this.setState({ transactions }, () => this.calculateIncomeExpenses());
+        this.setState({ transactions }, () => this.requestTransactionsHistory());
       }
     } catch (error) {
       console.log(error.message);
     }
   };
+
+  checkWereDataRequests = ({ currentMonth, currentYear }) =>
+    this.state.wereDataRequests.find(
+      (item) => item.currentMonth === currentMonth && item.currentYear === currentYear,
+    );
+
+  getTransactionCurrentMonth = () => {
+    const transactionsCurrentMonth = [...this.state.transactions].filter(
+      (transaction) =>
+        transaction.date.getMonth() === this.state.currentMonth &&
+        transaction.date.getFullYear() === this.state.currentYear,
+    );
+    this.setState({ transactionsCurrentMonth }, () => this.calculateIncomeExpenses());
+  };
+
   requestTransactionsHistory = async () => {
     try {
-      console.log(this.state.currentTimezone);
       const date = {
         currentMonth: this.state.date.getMonth(),
         currentYear: this.state.date.getFullYear(),
         // currentTimeZone — for the correct time to query the transaction data because there are different time zones
         currentTimezone: this.state.currentTimezone,
       };
-      const transactions = await this.request('/api/transactionsHistory', 'POST', date);
-      if (transactions) {
-        this.setState({ transactions }, () => this.calculateIncomeExpenses());
-      }
+      if (!this.checkWereDataRequests(date)) {
+        const transactions = await this.request('/api/transactionsHistory', 'POST', date);
+        transactions.forEach((transaction) => (transaction.date = new Date(transaction.date)));
+        if (transactions) {
+          this.setState(
+            {
+              transactions: [...this.state.transactions, ...transactions],
+              wereDataRequests: [...this.state.wereDataRequests, date],
+              // transactions
+            },
+            () => this.getTransactionCurrentMonth(),
+          );
+        }
+      } else this.getTransactionCurrentMonth();
     } catch (error) {
       console.log(error.message);
     }
@@ -163,6 +200,8 @@ class App extends React.Component {
         <main>
           <div className="container">
             <Total
+              changeMonth={this.changeMonth}
+              currentMonth={this.state.currentMonth}
               income={this.state.sumIncome}
               expenses={this.state.sumExpenses}
               totalMoney={this.state.totalMoney}
@@ -176,7 +215,8 @@ class App extends React.Component {
               date={this.state.date}
             />
             <History
-              transactions={this.state.transactions}
+              currentMonth={this.state.currentMonth}
+              transactions={this.state.transactionsCurrentMonth}
               deleteTransaction={this.deleteTransaction}
               currentTimezone={this.state.currentTimezone}
             />

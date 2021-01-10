@@ -37,7 +37,7 @@ export const Operation = ({
             placeholder="Введите дату"
             onChange={(event) => addDate(event)}
             required={true}
-            value={date.toISOString().slice(0,10)}
+            value={date.toISOString().slice(0, 10)}
           />
         </label>
         <div className="operation__btns">
