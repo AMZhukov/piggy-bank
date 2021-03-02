@@ -5,7 +5,7 @@ const { getFirstDayOfMonth, getFirstDayOfNextMonth } = require('./operationWithD
 const router = Router();
 
 // /api/addTransaction
-router.post('/addTransaction', async (req, res) => {
+router.post('/createTransaction', async (req, res) => {
   try {
     const { description, amount, isIncome, date } = req.body;
     const transaction = new Transaction({

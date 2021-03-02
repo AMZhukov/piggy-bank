@@ -1,11 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 :root {
-  --bg-color: #f9f9f9;
   --main-color: #fff;
-  --border-color: #aaa;
-  --footer-color: #ddd;
-  --positive-color: olivedrab;
+  --positive-color: #4fc70e;
   --negative-color: tomato;
 }
 
@@ -21,15 +18,12 @@ html {
 
 body {
   margin: 0;
-  background-color: var(--bg-color);
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   color: black;
-  min-height: 100vh;
+
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
 img {
@@ -84,8 +78,7 @@ main {
 
 .total {
   padding: 20px;
-  background-color: var(--main-color);
-  border: 1px solid var(--border-color);
+  border: 1px solid;
   border-radius: 25px;
 }
 
@@ -95,20 +88,22 @@ main {
 }
 
 .total__header {
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .total__month {
-    display: flex;
+  display: flex;
 }
 
 .total__button-arrow {
   border: none;
   width: 100%;
   height: 100%;
+  background-color: inherit;
+  color: inherit;
 }
 
 .total__main {
@@ -123,7 +118,7 @@ main {
 }
 
 .total__main-item:first-child {
-  border-right: 1px solid var(--border-color);
+  border-right: 1px solid;
 }
 
 .total__money {
@@ -145,7 +140,6 @@ main {
 
 .history__item {
   align-items: center;
-  background-color: var(--main-color);
   border-width: 1px;
   border-style: solid;
   border-left: 10px solid;
@@ -205,19 +199,17 @@ main {
 .operation {
   margin-top: 40px;
   margin-bottom: 40px;
-  background-color: var(--footer-color);
   border-radius: 25px;
   padding: 15px 15px;
 }
 
 .operation__fields {
   display: block;
-  border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 10px 15px;
-  margin: 5px 0;
+  margin: 15px 0;
   width: 100%;
-  outline: transparent;
+  outline: none;
 }
 
 .operation__fields:focus {
