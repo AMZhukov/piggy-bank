@@ -13,6 +13,14 @@ app.use(express.json({ extended: true }));
 
 app.use('/api', require('./routes/API.js'));
 
+if (isProd) {
+  app.use('/', express.static(path.join(__dirname, 'client', 'build')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
+
 async function start() {
   try {
     await mongoose.connect(process.env.LINK, {
