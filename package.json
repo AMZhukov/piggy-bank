@@ -8,8 +8,7 @@
     "startServer": "nodemon server.js",
     "startClient": "npm run start --prefix client",
     "start": "concurrently \"npm run startClient\" \"npm run startServer\"",
-    "prodServer": "cross-env NODE_ENV=production node server.js ",
-    "prod": "concurrently \"npm run startClient\" \"npm run prodServer\""
+    "prodServer": "cross-env NODE_ENV=production node server.js "
   },
   "repository": {
     "type": "git",
