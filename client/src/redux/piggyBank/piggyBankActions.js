@@ -113,7 +113,7 @@ export function changeDate(newDate) {
     try {
       const date = new Date(newDate);
 
-      if (this.checkData(date, 'date')) {
+      if (checkData(date, 'date')) {
         const currentMonth = date.getMonth();
         const currentYear = date.getFullYear();
 
@@ -225,3 +225,4 @@ function calculateTotalMoney() {
     });
   };
 }
+
