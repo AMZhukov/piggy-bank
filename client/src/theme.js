@@ -6,6 +6,9 @@ export const lightTheme = {
   borderColor: '#aaa',
 };
 
+
+
+
 export const darkTheme = {
   body: '#32302b',
   text: '#FAFAFA',
