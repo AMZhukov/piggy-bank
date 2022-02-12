@@ -6,7 +6,7 @@ export const History = ({ transactions, deleteTransaction }) => {
     <section className="history">
       <details>
         <summary className="history__summary">
-          <h3 style="history__title">История расходов</h3>
+          <h3 className="history__title">История расходов</h3>
         </summary>
         {transactions.length > 0 ? (
           <ul className="history__list">
