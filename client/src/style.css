@@ -138,6 +138,14 @@ main {
   margin-top: 40px;
 }
 
+.history__summary {
+  text-align: center;
+}
+
+.history__title {
+  display: inline;
+}
+
 .history__item {
   align-items: center;
   border-width: 1px;
