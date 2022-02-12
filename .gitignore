@@ -6,3 +6,4 @@ client/src/remove
 .env.dev
 .env.prod
 plan.txt
+client/.eslintcache
